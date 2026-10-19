@@ -31,7 +31,8 @@ Follow these steps to set up your local development environment:
    .venv\Scripts\Activate.ps1
 
    Bash:
-   source .venv/Scripts/activate
+   source .venv/bin/activate
+   (Git Bash on Windows: source .venv/Scripts/activate)
 
 3. Install project dependencies:
    python -m pip install -r requirements.txt
