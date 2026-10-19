@@ -18,3 +18,12 @@ def is_valid_email(email):
     if not isinstance(email, str):
         return False
     return email.count("@") == 1 and "." in email.split("@")[1]
+
+def mask_email(email):
+    """Hide the user part of an email (e.g. 'tester@example.com' -> 't***@example.com').
+    Returns email unchanged if not valid.
+    """
+    if not is_valid_email(email):
+        return email
+    local, domain = email.split("@")
+    return f"{local[0]}***@{domain}"
