@@ -20,14 +20,47 @@ from .validation import REQUIRED_FIELDS
 
 def read_csv_records(path):
     """CSV -> list of raw dicts, one per data row (use csv.DictReader)."""
-    raise NotImplementedError("Task 4A: write read_csv_records")
+    with open_source(path) as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = reader.fieldnames
+        if fieldnames is None:
+            raise MissingColumnsError(path, list(REQUIRED_FIELDS))
+        missing = [f for f in REQUIRED_FIELDS if f not in fieldnames]
+        if missing:
+            raise MissingColumnsError(path, missing)
+        return list(reader)
 
 
 def read_json_records(path):
     """JSON -> list of raw records. Expected shape: {"suite": ..., "tests": [...]}."""
-    raise NotImplementedError("Task 4B: write read_json_records")
+    try:
+        with open_source(path) as handle:
+            data = json.load(handle)
+    except json.JSONDecodeError as error:
+        raise MalformedSourceError(path, f"invalid JSON at line {error.lineno}, column {error.colno}: {error.msg}") from error
+
+    if not isinstance(data, dict):
+        raise MalformedSourceError(path, "JSON root must be an object")
+    if "tests" not in data or not isinstance(data["tests"], list):
+        raise MalformedSourceError(path, "JSON missing 'tests' list")
+    return data["tests"]
 
 
 def read_xml_records(path):
     """XML -> list of raw dicts, one per <testcase> element at ANY depth."""
-    raise NotImplementedError("Task 4C: write read_xml_records")
+    try:
+        with open_source(path) as handle:
+            tree = ET.parse(handle)
+            root = tree.getroot()
+    except ET.ParseError as error:
+        raise MalformedSourceError(path, f"invalid XML: {error}") from error
+
+    records = []
+    for case in root.iter("testcase"):
+        records.append({
+            "id": case.get("id"),
+            "status": case.get("status"),
+            "title": case.findtext("title"),
+            "duration": case.findtext("duration"),
+        })
+    return records
