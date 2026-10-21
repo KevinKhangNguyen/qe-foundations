@@ -1,7 +1,6 @@
 # Ingestion module - design notes (Week 2, Day 2)
 
-Answer in your own words, 2-4 sentences each. Replace every line that starts with
-`TODO:`. (Delete nothing else.)
+Answer in your own words, 2-4 sentences each. Replace every line that starts with. (Delete nothing else.)
 
 ## 1. Exceptions or assertions?
 In `validate_record` I raise exceptions for a negative duration, but in
